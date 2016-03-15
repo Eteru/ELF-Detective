@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include "elf-bfd.h"
+
 void AddressBinding::find_bindings()
 {
     std::string name;
@@ -131,6 +133,8 @@ void AddressBinding::find_bindings()
                 bfd_sprintf_vma(cur_bfd, buf, (*current)->value);
                 ab.offset = buf;
 
+                ab.sz = ((elf_symbol_type *) (*current))->internal_elf_sym.st_size;
+
                 addrbinds[name] = ab;
             }
         }
@@ -150,6 +154,9 @@ void AddressBinding::dump_bindings()
 
         std::cout << "Symbol name: " << symbol.first << std::endl;
         std::cout << "Symbol Type: " << symbol.second.type << std::endl;
+        if (symbol.second.type == "Variable")
+            std::cout << "Variable size: " << symbol.second.sz << std::endl;
+
         std::cout << "\tThis symbol is used, but unknown in object file: "
                 << symbol.second.undefined_in << std::endl;
         std::cout << "\tAddress in *" << symbol.second.undefined_in

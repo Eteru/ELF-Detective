@@ -26,6 +26,7 @@ typedef struct
     std::string section_name;
     std::string section_value;
     std::string offset;
+    bfd_vma sz;
 } addrbind;
 
 /* Pseudo FILE object for strings.  */
