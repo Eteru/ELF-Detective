@@ -16,12 +16,16 @@
 typedef struct
 {
     std::string name;
+    std::string type;
     std::string undefined_in;
     std::string defined_in;
     std::string exe_name;
     std::string undef_value;
     std::string def_value;
     std::string exe_value;
+    std::string section_name;
+    std::string section_value;
+    std::string offset;
 } addrbind;
 
 /* Pseudo FILE object for strings.  */

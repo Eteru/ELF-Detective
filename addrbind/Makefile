@@ -1,7 +1,7 @@
 CC=g++
 CFLAGS=-std=c++11 -c
 LDFLAGS=-lbfd -lopcodes
-SOURCES=tools.cpp ELFFile.cpp addrbind.cpp
+SOURCES=addrbind.cpp tools.cpp ELFFile.cpp AddressBinding.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=elfdetective
 

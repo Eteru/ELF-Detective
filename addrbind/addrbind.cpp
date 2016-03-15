@@ -1,8 +1,5 @@
 #include <iostream>
-#include <iomanip>
 #include <vector>
-#include <memory>
-#include <unordered_map>
 
 #include <cstdlib>
 #include <cstdio>
@@ -14,6 +11,7 @@
 #include <libiberty/safe-ctype.h>
 
 #include "ELFFile.h"
+#include "AddressBinding.h"
 
 #include "tools.h"
 #include "elf-bfd.h"
@@ -1829,7 +1827,6 @@ static void dump_dynamic_relocs (bfd *abfd)
 static const string filename = "ELFDetective";
 static ELFFile *exefile = nullptr;
 static vector<ELFFile *> objfiles;
-static unordered_map<string, addrbind> addrbinds;
 
 static void check_symbols (ELFFile *file, bfd_boolean dynamic)
 {
@@ -1911,7 +1908,7 @@ static void gather_symbols (ELFFile *file)
 {
     bfd *abfd = file->getBfd();
 
-    cout << endl << bfd_get_filename (abfd) << ":     file format "
+    cout << bfd_get_filename (abfd) << ":     file format "
          << abfd->xvec->name << endl;
 
     slurp_symtab (file);
@@ -1978,158 +1975,6 @@ static void parse_args(int argc, char **args)
     }
 }
 
-/*
- * Might need think of a better way to parse the files.
- */
-
-static void find_bindings()
-{
-    char buf[30];
-    symvalue dec_value;
-    asymbol **current;
-    addrbind ab;
-
-    // Parse each object file looking for undefined values
-    for (ELFFile *E : objfiles) {
-         current = E->getSyms();
-
-        for (int i = 0; i < E->getSymcount(); ++i) {
-            bfd *cur_bfd;
-
-            if (*current == NULL)
-                continue;
-
-            else if ((cur_bfd = bfd_asymbol_bfd (*current)) == NULL)
-                continue;
-
-            else if (process_section_p ((* current)->section)
-                     && (dump_special_syms
-                         || !bfd_is_target_special_symbol (cur_bfd, *current))) {
-
-                if (bfd_is_und_section((*current)->section)) {
-                    ab.name = bfd_asymbol_name(*current);
-
-                    ab.undefined_in = E->getName();
-                    dec_value = bfd_asymbol_value(*current);
-
-                    bfd_sprintf_vma(cur_bfd, buf, dec_value);
-                    ab.undef_value = buf;
-
-                    ab.defined_in = "UNK";
-                    ab.exe_name = exefile->getName();
-
-                    addrbinds[ab.name] = ab;
-                }
-            }
-
-            current++;
-        }
-
-    }
-
-    // Parse each object file looking for definitions of what we found
-    for (ELFFile *E : objfiles) {
-        current = E->getSyms();
-
-        for (int i = 0; i < E->getSymcount(); ++i) {
-            bfd *cur_bfd;
-            if (*current == NULL)
-                continue;
-
-            else if ((cur_bfd = bfd_asymbol_bfd (*current)) == NULL)
-                continue;
-
-            else if (process_section_p ((* current)->section)
-                     && (dump_special_syms
-                         || !bfd_is_target_special_symbol (cur_bfd, *current))) {
-
-                if (!bfd_is_und_section((*current)->section)) {
-                    string name = (*current)->name;
-                    auto it = addrbinds.find(name);
-
-                    if (it == addrbinds.end()) {
-                        current++;
-                        continue;
-                    }
-
-                    ab = it->second;
-                    ab.defined_in = E->getName();
-                    dec_value = bfd_asymbol_value(*current);
-
-                    bfd_sprintf_vma(cur_bfd, buf, dec_value);
-                    ab.def_value = buf;
-
-                    addrbinds[name] = ab;
-                }
-            }
-
-            current++;
-        }
-    }
-    // Parse symbols from exefile
-    current = exefile->getSyms();
-    for (int i = 0; i < exefile ->getSymcount(); ++i) {
-        bfd *cur_bfd;
-        if (*current == NULL)
-            continue;
-
-        else if ((cur_bfd = bfd_asymbol_bfd (*current)) == NULL)
-            continue;
-
-        else if (process_section_p ((* current)->section)
-                 && (dump_special_syms
-                     || !bfd_is_target_special_symbol (cur_bfd, *current))) {
-
-            if (!bfd_is_und_section((*current)->section)) {
-                string name = (*current)->name;
-                auto it = addrbinds.find(name);
-
-                if (it == addrbinds.end()) {
-                    current++;
-                    continue;
-                }
-
-                ab = it->second;
-                dec_value = bfd_asymbol_value(*current);
-
-                bfd_sprintf_vma(cur_bfd, buf, dec_value);
-                ab.exe_value = buf;
-
-                addrbinds[name] = ab;
-            }
-        }
-
-        current++;
-    }
-
-    cout << endl
-         << endl;
-
-    cout << setw(20) << left << "NAME";
-    cout << setw(10) << left << "UNDEF_IN";
-    cout << setw(20) << left << "VALUE";
-    cout << setw(10) << left << "DEF_IN";
-    cout << setw(20) << left << "VALUE";
-    cout << setw(10) << left << "EXEC_FILE";
-    cout << setw(20) << left << "VALUE";
-    cout << endl;
-
-    for (auto symbol : addrbinds) {
-        if (symbol.second.defined_in == "UNK")
-            continue;
-
-        cout << setw(20) << left << symbol.first;
-        cout << setw(10) << left << symbol.second.undefined_in;
-        cout << setw(20) << left << symbol.second.undef_value;
-        cout << setw(10) << left << symbol.second.defined_in;
-        cout << setw(20) << left << symbol.second.def_value;
-        cout << setw(10) << left << symbol.second.exe_name;
-        cout << setw(20) << left << symbol.second.exe_value;
-        cout << endl;
-    }
-
-}
-
 static void cleanup()
 {
     delete exefile;
@@ -2161,6 +2006,7 @@ static void cleanup()
 
 int main (int argc, char **argv)
 {
+    AddressBinding *AB;
     parse_args(argc, argv);
 
     bfd_init ();
@@ -2176,7 +2022,10 @@ int main (int argc, char **argv)
     for (ELFFile *E : objfiles)
         prepare_file(E);
 
-    find_bindings();
+    AB = new AddressBinding(objfiles, exefile);
+
+    AB->find_bindings();
+    AB->dump_bindings();
 
     cleanup();
 
