@@ -1908,7 +1908,7 @@ static void gather_symbols (ELFFile *file)
 {
     bfd *abfd = file->getBfd();
 
-    cout << bfd_get_filename (abfd) << ":     file format "
+    cout << bfd_get_filename (abfd) << ": file format "
          << abfd->xvec->name << endl;
 
     slurp_symtab (file);

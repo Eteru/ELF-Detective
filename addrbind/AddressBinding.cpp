@@ -87,6 +87,8 @@ void AddressBinding::find_bindings()
                     bfd_sprintf_vma(cur_bfd, buf, dec_value);
                     ab.def_value = buf;
 
+                    ab.undefined_section = (*current)->section->name;
+
                     addrbinds[name] = ab;
                 }
             }
@@ -145,33 +147,39 @@ void AddressBinding::find_bindings()
 
 void AddressBinding::dump_bindings()
 {
-    std::cout << std::endl;
-
     for (auto symbol : addrbinds) {
         if (symbol.second.defined_in == "UNK")
             continue;
 
+        std::cout << std::endl << "--------------------------"
+                << std::endl;
 
+        // Symbol information
         std::cout << "Symbol name: " << symbol.first << std::endl;
         std::cout << "Symbol Type: " << symbol.second.type << std::endl;
         if (symbol.second.type == "Variable")
             std::cout << "Variable size: " << symbol.second.sz << std::endl;
 
+        // Undefined information
+        std::cout << std::endl;
         std::cout << "\tThis symbol is used, but unknown in object file: "
                 << symbol.second.undefined_in << std::endl;
         std::cout << "\tAddress in *" << symbol.second.undefined_in
                 << "* is " << symbol.second.undef_value << std::endl;
+
+        // Defined information
+        std::cout << std::endl;
         std::cout << "\tThis symbol is defined in: "
                 << symbol.second.defined_in << std::endl;
         std::cout << "\tAddress in *" << symbol.second.defined_in
                 << "* is " << symbol.second.def_value << std::endl << std::endl;
+        std::cout << "\tSection: " << symbol.second.undefined_section << std::endl;
 
         std::cout << "\tAddress in executable file *" << symbol.second.exe_name
                 << "* is " << symbol.second.exe_value << std::endl;
         std::cout << "\tSection: " << symbol.second.section_name
                 << " at address: " << symbol.second.section_value << std::endl;
         std::cout << "\tOffset: " << symbol.second.offset << std::endl;
-        std::cout << std::endl;
     }
 }
 
