@@ -9,18 +9,18 @@
 
 class AddressBinding
 {
-    public:
-        void find_bindings();
-        void dump_bindings();
+public:
+    void find_bindings();
+    void dump_bindings() const;
 
-        AddressBinding();
-        AddressBinding(std::vector<ELFFile *>, ELFFile *);
-        virtual ~AddressBinding();
-    protected:
-    private:
-        std::unordered_map<std::string, addrbind> addrbinds;
-        std::vector<ELFFile *> objfiles;
-        ELFFile *exefile;
+    AddressBinding();
+    AddressBinding(std::vector<ELFFile *>, ELFFile *);
+    virtual ~AddressBinding();
+protected:
+private:
+    std::unordered_map<std::string, addrbind> addrbinds;
+    std::vector<ELFFile *> objfiles;
+    ELFFile *exefile;
 };
 
 #endif // ADDRESSBINDING_H

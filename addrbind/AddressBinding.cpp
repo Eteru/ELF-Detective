@@ -9,15 +9,17 @@ void AddressBinding::find_bindings()
     std::string name;
 
     char buf[30];
-    symvalue dec_value;
-    asymbol **current;
     addrbind ab;
+    asymbol **current;
+    symvalue dec_value;
 
     // Parse each object file looking for undefined values
-    for (ELFFile *E : objfiles) {
-         current = E->getSyms();
+    for (ELFFile *E : objfiles)
+    {
+        current = E->getSyms();
 
-        for (int i = 0; i < E->getSymcount(); ++i) {
+        for (int i = 0; i < E->getSymcount(); ++i)
+        {
             bfd *cur_bfd;
 
             if (*current == NULL)
@@ -26,9 +28,11 @@ void AddressBinding::find_bindings()
             else if ((cur_bfd = bfd_asymbol_bfd (*current)) == NULL)
                 continue;
 
-            else if (!bfd_is_target_special_symbol (cur_bfd, *current)) {
+            else if (!bfd_is_target_special_symbol (cur_bfd, *current))
+            {
 
-                if (bfd_is_und_section((*current)->section)) {
+                if (bfd_is_und_section((*current)->section))
+                {
                     ab.name = bfd_asymbol_name(*current);
 
                     ab.undefined_in = E->getName();
@@ -52,10 +56,12 @@ void AddressBinding::find_bindings()
     }
 
     // Parse each object file looking for definitions of what we found
-    for (ELFFile *E : objfiles) {
+    for (ELFFile *E : objfiles)
+    {
         current = E->getSyms();
 
-        for (int i = 0; i < E->getSymcount(); ++i) {
+        for (int i = 0; i < E->getSymcount(); ++i)
+        {
             bfd *cur_bfd;
             if (*current == NULL)
                 continue;
@@ -63,15 +69,18 @@ void AddressBinding::find_bindings()
             else if ((cur_bfd = bfd_asymbol_bfd (*current)) == NULL)
                 continue;
 
-            else if (!bfd_is_target_special_symbol (cur_bfd, *current)) {
+            else if (!bfd_is_target_special_symbol (cur_bfd, *current))
+            {
 
-                if (!bfd_is_und_section((*current)->section)) {
+                if (!bfd_is_und_section((*current)->section))
+                {
                     name = (*current)->name;
 
 
                     auto it = addrbinds.find(name);
 
-                    if (it == addrbinds.end()) {
+                    if (it == addrbinds.end())
+                    {
                         current++;
                         continue;
                     }
@@ -98,7 +107,8 @@ void AddressBinding::find_bindings()
     }
     // Parse symbols from exefile
     current = exefile->getSyms();
-    for (int i = 0; i < exefile ->getSymcount(); ++i) {
+    for (int i = 0; i < exefile ->getSymcount(); ++i)
+    {
         bfd *cur_bfd;
         if (*current == NULL)
             continue;
@@ -106,13 +116,16 @@ void AddressBinding::find_bindings()
         else if ((cur_bfd = bfd_asymbol_bfd (*current)) == NULL)
             continue;
 
-        else if (!bfd_is_target_special_symbol (cur_bfd, *current)) {
+        else if (!bfd_is_target_special_symbol (cur_bfd, *current))
+        {
 
-            if (!bfd_is_und_section((*current)->section)) {
+            if (!bfd_is_und_section((*current)->section))
+            {
                 name = (*current)->name;
                 auto it = addrbinds.find(name);
 
-                if (it == addrbinds.end()) {
+                if (it == addrbinds.end())
+                {
                     current++;
                     continue;
                 }
@@ -145,14 +158,15 @@ void AddressBinding::find_bindings()
     }
 }
 
-void AddressBinding::dump_bindings()
+void AddressBinding::dump_bindings() const
 {
-    for (auto symbol : addrbinds) {
+    for (auto symbol : addrbinds)
+    {
         if (symbol.second.defined_in == "UNK")
             continue;
 
         std::cout << std::endl << "--------------------------"
-                << std::endl;
+                  << std::endl;
 
         // Symbol information
         std::cout << "Symbol name: " << symbol.first << std::endl;
@@ -163,22 +177,24 @@ void AddressBinding::dump_bindings()
         // Undefined information
         std::cout << std::endl;
         std::cout << "\tThis symbol is used, but unknown in object file: "
-                << symbol.second.undefined_in << std::endl;
+                  << symbol.second.undefined_in << std::endl;
         std::cout << "\tAddress in *" << symbol.second.undefined_in
-                << "* is " << symbol.second.undef_value << std::endl;
+                  << "* is " << symbol.second.undef_value << std::endl;
 
         // Defined information
         std::cout << std::endl;
         std::cout << "\tThis symbol is defined in: "
-                << symbol.second.defined_in << std::endl;
+                  << symbol.second.defined_in << std::endl;
         std::cout << "\tAddress in *" << symbol.second.defined_in
-                << "* is " << symbol.second.def_value << std::endl << std::endl;
+                  << "* is " << symbol.second.def_value << std::endl;
         std::cout << "\tSection: " << symbol.second.undefined_section << std::endl;
 
+        // Executable file information
+        std::cout << std::endl;;
         std::cout << "\tAddress in executable file *" << symbol.second.exe_name
-                << "* is " << symbol.second.exe_value << std::endl;
+                  << "* is " << symbol.second.exe_value << std::endl;
         std::cout << "\tSection: " << symbol.second.section_name
-                << " at address: " << symbol.second.section_value << std::endl;
+                  << " at address: " << symbol.second.section_value << std::endl;
         std::cout << "\tOffset: " << symbol.second.offset << std::endl;
     }
 }

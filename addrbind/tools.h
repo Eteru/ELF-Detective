@@ -55,47 +55,28 @@ struct print_file_list
     int first;
 };
 
-/* Extra info to pass to the section disassembler and address printing
-   function.  */
-struct objdump_disasm_info
-{
-    bfd *              abfd;
-    asection *         sec;
-    bfd_boolean        require_sec;
-    arelent **         dynrelbuf;
-    long               dynrelcount;
-    disassembler_ftype disassemble_fn;
-    arelent *          reloc;
-};
-
-/* A structure to record the sections mentioned in -j switches.  */
-struct only
-{
-    const char * name; /* The name of the section.  */
-    bfd_boolean  seen; /* A flag to indicate that the section has been found in one or more input files.  */
-    struct only * next; /* Pointer to the next structure in the list.  */
-};
-
 /* Return the filename in a static buffer.  */
-const char *bfd_get_archive_filename (const bfd *);
+const char *bfd_get_archive_filename(const bfd *);
 
-void bfd_nonfatal (const char *);
+void bfd_nonfatal(const char *);
 
-void bfd_nonfatal_message (const char *, const bfd *, const asection *,
-                           const char *, ...);
+void bfd_nonfatal_message(const char *, const bfd *, const asection *,
+                          const char *, ...);
 
-void bfd_fatal (const char *) ATTRIBUTE_NORETURN;
+void bfd_fatal(const char *) ATTRIBUTE_NORETURN;
 
-void report (const char *, va_list) ATTRIBUTE_PRINTF(1,0);
+void report(const char *, va_list) ATTRIBUTE_PRINTF(1,0);
 
-void fatal (const char *, ...) ATTRIBUTE_PRINTF_1 ATTRIBUTE_NORETURN;
+void fatal(const char *, ...) ATTRIBUTE_PRINTF_1 ATTRIBUTE_NORETURN;
 
-void non_fatal (const char *, ...) ATTRIBUTE_PRINTF_1;
+void non_fatal(const char *, ...) ATTRIBUTE_PRINTF_1;
 
-void list_matching_formats (char **);
+void list_matching_formats(char **);
 
-off_t get_file_size (const char *);
+off_t get_file_size(const char *);
 
-extern void *bfd_malloc (bfd_size_type);
+extern void *bfd_malloc(bfd_size_type);
+
+int compare_symbols(const void *, const void *);
 
 #endif // TOOLS_H_INCLUDED
