@@ -22,13 +22,13 @@
 
 ./ELFDetective to run the program
 
-Add an executable file: Click on the first icon or CTRL+E
-Add an object file: Click on the second icon or CTRL+O
-Run the project: Click on the third icon or CTRL+R
-Clear the project: Click on the last icon or CTRL+C
-See instruction hexcodes: Check the hexcodes checkbox
+* Add an executable file: Click on the first icon or CTRL+E
+* Add an object file: Click on the second icon or CTRL+O
+* Run the project: Click on the third icon or CTRL+R
+* Clear the project: Click on the last icon or CTRL+C
+* See instruction hexcodes: Check the hexcodes checkbox
 
-To inspect any information from the project, click on any symbol / code line from the executable panel.
+* To inspect any information from the project, click on any symbol / code line from the executable panel.
 
 #Contact
 
