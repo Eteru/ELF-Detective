@@ -1,6 +1,10 @@
 #ifndef DISASSEMBLEMODULE_H
 #define DISASSEMBLEMODULE_H
 
+// this needs to be defined before any bfd.h include
+// due to a 'won't fix' bug
+#define PACKAGE "elfdetective"
+
 #include <bfd.h>
 #include <dis-asm.h>
 #include <libiberty/safe-ctype.h>

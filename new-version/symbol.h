@@ -3,6 +3,11 @@
 
 #include <string>
 #include <vector>
+
+// this needs to be defined before any bfd.h include
+// due to a 'won't fix' bug
+#define PACKAGE "elfdetective"
+
 #include <bfd.h>
 
 const int SYMBOL_VAR = 0;

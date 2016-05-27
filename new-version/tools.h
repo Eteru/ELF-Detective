@@ -8,6 +8,11 @@
 #include <cstring>
 #include <cstdlib>
 #include <cerrno>
+
+// this needs to be defined before any bfd.h include
+// due to a 'won't fix' bug
+#define PACKAGE "elfdetective"
+
 #include <bfd.h>
 #include <dis-asm.h>
 
