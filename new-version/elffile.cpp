@@ -207,6 +207,25 @@ void ELFFile::setSynthcount(long synthcount)
   this->synthcount = synthcount;
 }
 
+void ELFFile::addFunction(Function *f)
+{
+  this->functions.push_back(f);
+}
+
+std::vector<Function *> ELFFile::getFunctions() const
+{
+  return this->functions;
+}
+
+void ELFFile::setView(QWidget *v)
+{
+  this->view = v;
+}
+QWidget *ELFFile::getView() const
+{
+  return this->view;
+}
+
 ELFFile::ELFFile() : symcount(0), dynsymcount(0), synthcount(0) {}
 
 ELFFile::ELFFile(std::string fname)
@@ -245,4 +264,7 @@ ELFFile::~ELFFile()
       bfd_close(this->abfd);
       this->abfd = nullptr;
     }
+
+  for (Function *f : this->functions)
+    delete f;
 }

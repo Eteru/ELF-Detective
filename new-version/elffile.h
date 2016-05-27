@@ -4,8 +4,11 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <QWidget>
 
 #include <bfd.h>
+
+#include "function.h"
 
 const int BFD_FILE_SIZE = 10001;
 const int BFD_FILE_NULL = 10002;
@@ -18,54 +21,64 @@ const int ELF_WRONG_TYPE = 20003;
 
 class ELFFile
 {
-    public:
-        std::string getName();
+public:
+  std::string getName();
 
-        int initBfd(int type);
+  int initBfd(int type);
 
-        void slurp_dynamic_symtab();
-        void slurp_symtab();
-        void gather_symbols();
+  void slurp_dynamic_symtab();
+  void slurp_symtab();
+  void gather_symbols();
 
-        bfd* getBfd() const;
+  bfd* getBfd() const;
 
-        asymbol *getSynthsyms() const;
-        asymbol **getSyms() const;
-        asymbol **getDSyms() const;
-        long getSymcount() const;
-        long getDynSymcount() const;
-        long getSynthcount() const;
+  asymbol *getSynthsyms() const;
+  asymbol **getSyms() const;
+  asymbol **getDSyms() const;
+  long getSymcount() const;
+  long getDynSymcount() const;
+  long getSynthcount() const;
 
-        std::vector<std::string> getSymbolList() const;
+  std::vector<std::string> getSymbolList() const;
 
-        void setSyms(asymbol **);
-        void setDSyms(asymbol **);
-        void setSynthsyms(asymbol *);
-        void setSymcount(long);
-        void setDynSymcount(long);
-        void setSynthcount(long);
+  void setSyms(asymbol **);
+  void setDSyms(asymbol **);
+  void setSynthsyms(asymbol *);
+  void setSymcount(long);
+  void setDynSymcount(long);
+  void setSynthcount(long);
 
-        ELFFile();
-        ELFFile(std::string);
-        virtual ~ELFFile();
+  void addFunction(Function *);
+  std::vector<Function *> getFunctions() const;
 
-    protected:
-    private:
-        std::string filepath;
-        std::string filename;
+  void setView(QWidget *);
+  QWidget *getView() const;
 
-        bfd *abfd = nullptr;
-        /* The symbol table.  */
-        asymbol **syms = nullptr;
-        /* The dynamic symbol table.  */
-        asymbol **dynsyms = nullptr;
-        /* The synthetic symbol table.  */
-        asymbol *synthsyms = nullptr;
+  ELFFile();
+  ELFFile(std::string);
+  virtual ~ELFFile();
 
-        /* Number of symbols in `syms'.  */
-        long symcount;
-        long dynsymcount;
-        long synthcount;
+protected:
+private:
+  std::string filepath;
+  std::string filename;
+
+  bfd *abfd = nullptr;
+  /* The symbol table.  */
+  asymbol **syms = nullptr;
+  /* The dynamic symbol table.  */
+  asymbol **dynsyms = nullptr;
+  /* The synthetic symbol table.  */
+  asymbol *synthsyms = nullptr;
+
+  /* Number of symbols in `syms'.  */
+  long symcount;
+  long dynsymcount;
+  long synthcount;
+
+  std::vector<Function *> functions;
+
+  QWidget *view;
 };
 
 #endif // ELFFILE_H

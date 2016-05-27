@@ -2,6 +2,7 @@
 #define OBJECTTAB_H
 
 #include <QWidget>
+#include <QTreeWidget>
 
 namespace Ui {
   class objecttab;
@@ -16,6 +17,11 @@ public:
   ~objecttab();
 
   void addSymbol(std::string);
+  void selectSymbol(QString) const;
+  void selectFunction(QString, int = -1) const;
+  void selectFunctionLine(QString, int) const;
+  void toggleHex(bool) const;
+  QTreeWidget *getTree() const;
 
 private:
   Ui::objecttab *ui;

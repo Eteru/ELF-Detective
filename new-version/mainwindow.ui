@@ -30,7 +30,7 @@
           <item>
            <widget class="QCheckBox" name="checkHex">
             <property name="toolTip">
-             <string>See intruction hexcodes</string>
+             <string>See instruction hexcodes</string>
             </property>
             <property name="text">
              <string>Hexcodes</string>
@@ -52,29 +52,69 @@
           </item>
           <item>
            <widget class="QPushButton" name="addExe">
+            <property name="toolTip">
+             <string>Add executable file (CTRL+E)</string>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">QPushButton {
+    border-width: 0;
+    border-radius: 0;
+    padding: 0;
+}</string>
+            </property>
             <property name="text">
-             <string>Add Executable</string>
+             <string/>
             </property>
            </widget>
           </item>
           <item alignment="Qt::AlignRight">
            <widget class="QPushButton" name="addObj">
+            <property name="toolTip">
+             <string>Add object file (CTRL+O)</string>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">QPushButton {
+    border-width: 0;
+    border-radius: 0;
+    padding: 0;
+}</string>
+            </property>
             <property name="text">
-             <string>Add Object</string>
+             <string/>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QPushButton" name="runProj">
+            <property name="toolTip">
+             <string>Run project (CTRL+R)</string>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">QPushButton {
+    border-width: 0;
+    border-radius: 0;
+    padding: 0;
+}</string>
+            </property>
             <property name="text">
-             <string>Run</string>
+             <string/>
             </property>
            </widget>
           </item>
           <item alignment="Qt::AlignRight">
            <widget class="QPushButton" name="clearProj">
+            <property name="toolTip">
+             <string>Clear Project (CTRL+C)</string>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">QPushButton {
+    border-width: 0;
+    border-radius: 0;
+    padding: 0;
+}</string>
+            </property>
             <property name="text">
-             <string>Clear Project</string>
+             <string/>
             </property>
            </widget>
           </item>
@@ -87,7 +127,7 @@
         <item>
          <widget class="QToolBox" name="exeToolBox">
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="exeDataPage">
            <property name="geometry">
@@ -95,7 +135,7 @@
              <x>0</x>
              <y>0</y>
              <width>474</width>
-             <height>319</height>
+             <height>324</height>
             </rect>
            </property>
            <attribute name="label">
@@ -103,7 +143,18 @@
            </attribute>
            <layout class="QHBoxLayout" name="horizontalLayout_6">
             <item>
-             <widget class="QListWidget" name="exeDataList"/>
+             <widget class="QListWidget" name="exeDataList">
+              <property name="styleSheet">
+               <string notr="true">QListView::item:selected {
+    background: #99ff99;
+	color: #000;
+}
+QListView::item:selected:!active {
+	background: #99ff99;
+	color: #000;
+}</string>
+              </property>
+             </widget>
             </item>
            </layout>
           </widget>
@@ -113,7 +164,7 @@
              <x>0</x>
              <y>0</y>
              <width>474</width>
-             <height>319</height>
+             <height>324</height>
             </rect>
            </property>
            <attribute name="label">
@@ -121,7 +172,23 @@
            </attribute>
            <layout class="QHBoxLayout" name="horizontalLayout_7">
             <item>
-             <widget class="QTreeView" name="exeFunctionsTree"/>
+             <widget class="QTreeWidget" name="exeFunctionsTree">
+              <property name="styleSheet">
+               <string notr="true">QTreeView::item:selected {
+    background: #99ff99;
+	color: #000;
+}
+QTreeView::item:selected:!active {
+	background: #99ff99;
+	color: #000;
+}</string>
+              </property>
+              <column>
+               <property name="text">
+                <string notr="true">1</string>
+               </property>
+              </column>
+             </widget>
             </item>
            </layout>
           </widget>

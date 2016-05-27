@@ -34,7 +34,7 @@ void AddressBinding::findBindings()
               if (strncmp((*current)->name, ".", 1) != 0 &&
                   !bfd_is_abs_section((*current)->section))
                 {
-                  name = (*current)->name;
+                  name = bfd_asymbol_name(*current);
                   auto it = symbolTable.find(name);
 
                   if (it != symbolTable.end())
@@ -42,19 +42,16 @@ void AddressBinding::findBindings()
 
                   if (bfd_is_und_section((*current)->section))
                     {
-                      entry.name = bfd_asymbol_name(*current);
+                      entry.name = name;
                       entry.undefined_in.push_back(E->getName());
-
-                      //                      dec_value = bfd_asymbol_value(*current);
-                      //                      bfd_sprintf_vma(cur_bfd, buf, dec_value);
-                      //                      entry.undef_value = buf;
 
                       symbolTable[name] = entry;
                     }
                   else
                     {
-                      entry.defined = true;
+                      entry.name = bfd_asymbol_name(*current);
 
+                      entry.defined = true;
                       entry.defined_in = E->getName();
 
                       dec_value = bfd_asymbol_value(*current);

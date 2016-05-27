@@ -13,6 +13,7 @@ class Symbol
 public:
   Symbol();
 
+  bool isEmpty() const;
   bool isUndefined() const;
   bool isVariable() const;
   bool isFunction() const;

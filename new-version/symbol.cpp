@@ -5,6 +5,11 @@ Symbol::Symbol()
   this->defined = false;
 }
 
+bool Symbol::isEmpty() const
+{
+  return (this->name == "");
+}
+
 bool Symbol::isUndefined() const
 {
   return (this->defined == false);
@@ -67,11 +72,11 @@ std::string Symbol::dumpData()
 std::string Symbol::removeExtraZeros(std::string addr)
 {
   std::string aux = addr.substr(0, 8);
-  std::cout << aux << std::endl;
+
   if (aux.compare("00000000") == 0)
     {
       aux = addr;
-      aux.replace(0, 7, "0x");
+      aux.replace(0, 8, "0x");
 
       return aux;
     }

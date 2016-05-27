@@ -17,7 +17,7 @@
    <item>
     <widget class="QToolBox" name="objToolBox">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="objData">
       <property name="geometry">
@@ -33,7 +33,18 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
-        <widget class="QListWidget" name="objDataList"/>
+        <widget class="QListWidget" name="objDataList">
+         <property name="styleSheet">
+          <string notr="true">QListView::item:selected {
+    background: #add8e6;
+	color: #000;
+}
+QListView::item:selected:!active {
+	background: #add8e6;
+	color: #000;
+}</string>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -51,7 +62,23 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
-        <widget class="QTreeView" name="objFunctionsTree"/>
+        <widget class="QTreeWidget" name="objFunctionsTree">
+         <property name="styleSheet">
+          <string notr="true">QTreeView::item:selected {
+    background: #add8e6;
+	color: #000;
+}
+QTreeView::item:selected:!active {
+	background: #add8e6;
+	color: #000;
+}</string>
+         </property>
+         <column>
+          <property name="text">
+           <string notr="true">1</string>
+          </property>
+         </column>
+        </widget>
        </item>
       </layout>
      </widget>

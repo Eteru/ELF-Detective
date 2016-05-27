@@ -34,7 +34,7 @@ const char *bfd_get_archive_filename(const bfd *abfd)
         }
     }
   sprintf(buf, "%s(%s)", bfd_get_filename(abfd->my_archive),
-           bfd_get_filename(abfd));
+          bfd_get_filename(abfd));
   return buf;
 }
 
@@ -63,9 +63,9 @@ void bfd_nonfatal(const char *string)
    PROGRAM:file[section]: printf-message: bfd-error-message.  */
 
 void bfd_nonfatal_message(const char *filename,
-                           const bfd *abfd,
-                           const asection *section,
-                           const char *format, ...)
+                          const bfd *abfd,
+                          const asection *section,
+                          const char *format, ...)
 {
   const char *errmsg;
   const char *section_name;
@@ -147,13 +147,13 @@ off_t get_file_size(const char * file_name)
         non_fatal("'%s': No such file", file_name);
       else
         non_fatal("Warning: could not locate '%s'.  reason: %s",
-                   file_name, strerror(errno));
+                  file_name, strerror(errno));
     }
   else if (! S_ISREG(statbuf.st_mode))
     non_fatal("Warning: '%s' is not an ordinary file", file_name);
   else if (statbuf.st_size < 0)
     non_fatal("Warning: '%s' has negative size, probably it is too large",
-               file_name);
+              file_name);
   else
     return statbuf.st_size;
 
