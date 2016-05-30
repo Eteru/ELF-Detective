@@ -301,19 +301,16 @@ void MainWindow::on_exeDataList_clicked(const QModelIndex &index)
   QString symbolName = ui->exeDataList->item(index.row())->text();
   Symbol sym = AB->getSymbol(symbolName.toStdString());
 
-  if (!sym.isUndefined())
-    {
-      std::string filename = sym.defined_in;
+  std::string filename = sym.defined_in;
 
-      for (unsigned int i = 0; i < this->objfiles.size(); ++i)
+  for (unsigned int i = 0; i < this->objfiles.size(); ++i)
+    {
+      if (this->objfiles[i]->getName().compare(filename) == 0)
         {
-          if (this->objfiles[i]->getName().compare(filename) == 0)
-            {
-              objecttab *ot = (objecttab *)this->objfiles[i]->getView();
-              ui->objTabs->setCurrentIndex(i);
-              ot->selectSymbol(symbolName);
-              break;
-            }
+          objecttab *ot = (objecttab *)this->objfiles[i]->getView();
+          ui->objTabs->setCurrentIndex(i);
+          ot->selectSymbol(symbolName);
+          break;
         }
     }
 

@@ -64,13 +64,13 @@ QListView::item:selected:!active {
        <item>
         <widget class="QTreeWidget" name="objFunctionsTree">
          <property name="styleSheet">
-          <string notr="true">QTreeView::item:selected {
+          <string notr="true">QTreeView::item:selected,
+QTreeView::item:selected:!active {
     background: #add8e6;
 	color: #000;
 }
-QTreeView::item:selected:!active {
-	background: #add8e6;
-	color: #000;
+QTreeView::branch:selected {
+	background-color: #add8e6;
 }</string>
          </property>
          <column>

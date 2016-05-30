@@ -174,12 +174,21 @@ QListView::item:selected:!active {
             <item>
              <widget class="QTreeWidget" name="exeFunctionsTree">
               <property name="styleSheet">
-               <string notr="true">QTreeView::item:selected {
-    background: #99ff99;
-	color: #000;
+               <string notr="true">QTreeView::branch:selected {
+  background: #99ff99;
 }
+
+QTreeView::branch:selected:active {
+  background: #99ff99;
+}
+
+QTreeView::branch:selected:!active {
+  background: #99ff99;
+}
+
+QTreeView::item:selected,
 QTreeView::item:selected:!active {
-	background: #99ff99;
+    background: #99ff99;
 	color: #000;
 }</string>
               </property>

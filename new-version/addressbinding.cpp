@@ -43,6 +43,7 @@ void AddressBinding::findBindings()
                   if (bfd_is_und_section((*current)->section))
                     {
                       entry.name = name;
+                      entry.defined_in = E->getName();
                       entry.undefined_in.push_back(E->getName());
 
                       symbolTable[name] = entry;

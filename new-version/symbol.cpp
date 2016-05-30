@@ -34,19 +34,9 @@ std::string Symbol::dumpData()
 
   // Symbol information
   ret += "Symbol Type: ";
-  if (this->type == SYMBOL_VAR)
-    {
-      ret += "Variable; size: ";
-      ret += this->sz + "\n";
-    }
-  else
-    {
-      ret += "Function\n";
-    }
+  ret += (this->type == SYMBOL_VAR) ? "Variable\n" : "Function\n";
 
   // Defined information
-  //ret += "Section: " + this->defined_section + "\n";
-  //ret += "Symbol definition in object file: " + this->defined_in + "\n";
   ret += "Address at definition is " + this->removeExtraZeros(this->def_value) + " (unbound)\n";
 
 
@@ -57,7 +47,6 @@ std::string Symbol::dumpData()
       for (std::string S : this->undefined_in)
         ret += " " + S;
       ret += "\n";
-      //ret += "Address in *" + this->undefined_in + "* is " + this->undef_value + "\n";
     }
 
   // Executable file information
@@ -68,12 +57,12 @@ std::string Symbol::dumpData()
 
   return ret;
 }
-#include <iostream>
+
 std::string Symbol::removeExtraZeros(std::string addr)
 {
   std::string aux = addr.substr(0, 8);
 
-  if (aux.compare("00000000") == 0)
+  if (addr.length() > 8 && aux.compare("00000000") == 0)
     {
       aux = addr;
       aux.replace(0, 8, "0x");
