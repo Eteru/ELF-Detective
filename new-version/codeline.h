@@ -12,12 +12,14 @@ public:
   void setLine(std::string);
   void setAddress(std::string);
   void setHexValue(std::string);
-  void setSymbol(std::string);
+  void setSymbol(std::string, std::string);
 
   std::string getLine() const;
   std::string getAddress() const;
   std::string getHexValue() const;
   std::string getSymbol() const;
+
+  void additionalInformation(std::string);
   std::string dumpData() const;
 
 protected:
@@ -26,5 +28,7 @@ private:
   std::string address;
   std::string hexValue;
   std::string symbol;
+  std::string symbolAddress;
+  std::string moreInfo;
 };
 #endif // CODELINE_H

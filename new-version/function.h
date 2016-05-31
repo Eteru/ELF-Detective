@@ -20,6 +20,8 @@ protected:
 private:
   std::string name;
   std::vector<CodeLine *> codelines;
+
+  bool hasRip;
 };
 
 #endif // FUNCTION_H

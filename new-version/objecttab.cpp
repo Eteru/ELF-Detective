@@ -11,7 +11,8 @@ objecttab::objecttab(QWidget *parent) :
 
   ui->objFunctions->activateWindow();
 
-  ui->objFunctionsTree->header()->close();
+  ui->objFunctionsTree->header()->hide();
+  ui->objFunctionsTree->headerItem()->setText(0, "Offset");
 }
 
 objecttab::~objecttab()

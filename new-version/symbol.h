@@ -46,7 +46,8 @@ public:
   bfd_vma sz;
 
 private:
-  std::string removeExtraZeros(std::string);
+  void removeExtraZeros();
+  bool cleared;
 };
 
 #endif // SYMBOL_H

@@ -100,7 +100,7 @@ namespace Disassembly
   }
 
   // finds where the referenced address points to
-  void objdump_print_addr_with_sym (bfd *abfd, asection *sec, asymbol *sym,
+  void print_addr_with_sym (bfd *abfd, asection *sec, asymbol *sym,
                                     bfd_vma vma, struct disassemble_info *inf)
   {
     (void)abfd;
@@ -109,13 +109,16 @@ namespace Disassembly
     if (sym && crtLine)
       {
         char buf[30];
-        struct objdump_disasm_info *aux;
+        struct disasm_info *aux;
 
-        objdump_print_value(vma, inf);
+        print_value(vma, inf);
 
-        aux = (struct objdump_disasm_info *) inf->application_data;
+        aux = (struct disasm_info *) inf->application_data;
 
         std::string value = bfd_asymbol_name(sym);
+
+        bfd_sprintf_vma(aux->abfd, buf, vma);
+        std::string symAddr = buf;
 
         if (bfd_asymbol_value(sym) > vma)
           {
@@ -130,7 +133,7 @@ namespace Disassembly
             value += buf;
           }
 
-        crtLine->setSymbol(value);
+        crtLine->setSymbol(value, symAddr);
       }
   }
 
@@ -142,7 +145,7 @@ namespace Disassembly
     long min = 0;
     long max_count = sorted_symcount;
     long thisplace;
-    struct objdump_disasm_info *aux;
+    struct disasm_info *aux;
     bfd *abfd;
     asection *sec;
     unsigned int opb;
@@ -151,7 +154,7 @@ namespace Disassembly
     if (sorted_symcount < 1)
       return NULL;
 
-    aux = (struct objdump_disasm_info *)inf->application_data;
+    aux = (struct disasm_info *)inf->application_data;
     abfd = aux->abfd;
     sec = aux->sec;
     opb = inf->octets_per_byte;
@@ -260,12 +263,12 @@ namespace Disassembly
   }
 
   // prints address value to code line
-  void objdump_print_value (bfd_vma vma, struct disassemble_info *inf)
+  void print_value (bfd_vma vma, struct disassemble_info *inf)
   {
     char buf[30];
-    struct objdump_disasm_info *aux;
+    struct disasm_info *aux;
 
-    aux = (struct objdump_disasm_info *) inf->application_data;
+    aux = (struct disasm_info *) inf->application_data;
     bfd_sprintf_vma(aux->abfd, buf, vma);
 
     std::string strBuf = std::string(buf).substr(0, 8);
@@ -286,17 +289,17 @@ namespace Disassembly
 
 
   // prints adress if possible
-  void objdump_print_addr (bfd_vma vma,
+  void print_addr (bfd_vma vma,
                            struct disassemble_info *inf)
   {
-    struct objdump_disasm_info *aux;
+    struct disasm_info *aux;
     asymbol *sym = NULL;
     bfd_boolean skip_find = FALSE;
 
-    aux = (struct objdump_disasm_info *)inf->application_data;
+    aux = (struct disasm_info *)inf->application_data;
 
     if (sorted_symcount < 1)
-        return;
+      return;
 
     if (aux->reloc != NULL
         && aux->reloc->sym_ptr_ptr != NULL
@@ -313,13 +316,13 @@ namespace Disassembly
     if (!skip_find)
       sym = find_symbol_for_address(vma, inf, NULL);
 
-    objdump_print_addr_with_sym(aux->abfd, aux->sec, sym, vma, inf);
+    print_addr_with_sym(aux->abfd, aux->sec, sym, vma, inf);
   }
 
   // used by disassembler, it prints an adress
-  void objdump_print_address (bfd_vma vma, struct disassemble_info *inf)
+  void print_address (bfd_vma vma, struct disassemble_info *inf)
   {
-    objdump_print_addr(vma, inf);
+    print_addr(vma, inf);
   }
 
   // removes any symbols that are useless for the disassembler
@@ -346,7 +349,7 @@ namespace Disassembly
   }
 
   // finds if there's a symbols associated with the vma
-  int objdump_symbol_at_address (bfd_vma vma, struct disassemble_info * inf)
+  int symbol_at_address (bfd_vma vma, struct disassemble_info * inf)
   {
     asymbol * sym;
 
@@ -367,7 +370,7 @@ namespace Disassembly
                           arelent **                relppend,
                           Function *f)
   {
-    struct objdump_disasm_info *aux;
+    struct disasm_info *aux;
     asection *section;
     int octets_per_line;
     int skip_addr_chars;
@@ -378,7 +381,7 @@ namespace Disassembly
 
     char hexdump[2];
 
-    aux = (struct objdump_disasm_info *) inf->application_data;
+    aux = (struct disasm_info *) inf->application_data;
     section = aux->sec;
 
     sfile.alloc = 120;
@@ -499,7 +502,7 @@ namespace Disassembly
           }
         bfd_vma j;
 
-        pb = octets_per_line;
+        pb = octets;
 
         if (inf->bytes_per_chunk)
           bpc = inf->bytes_per_chunk;
@@ -632,7 +635,7 @@ namespace Disassembly
     const struct elf_backend_data * bed;
     bfd_vma                      sign_adjust = 0;
     struct disassemble_info *    pinfo = (struct disassemble_info *) inf;
-    struct objdump_disasm_info * paux;
+    struct disasm_info * paux;
     unsigned int                 opb = pinfo->octets_per_byte;
     bfd_byte *                   data = NULL;
     bfd_size_type                datasize = 0;
@@ -675,7 +678,7 @@ namespace Disassembly
       return;
 
     // Decide which set of relocs to use.  Load them if necessary.
-    paux = (struct objdump_disasm_info *) pinfo->application_data;
+    paux = (struct disasm_info *) pinfo->application_data;
     if (paux->dynrelbuf)
       {
         rel_pp = paux->dynrelbuf;
@@ -847,7 +850,7 @@ namespace Disassembly
   void disassemble_data (ELFFile *E)
   {
     struct disassemble_info disasm_info;
-    struct objdump_disasm_info aux;
+    struct disasm_info aux;
     long i;
 
     start_address = (bfd_vma) -1;
@@ -891,8 +894,8 @@ namespace Disassembly
     aux.dynrelcount = 0;
     aux.reloc = NULL;
 
-    disasm_info.print_address_func = objdump_print_address;
-    disasm_info.symbol_at_address_func = objdump_symbol_at_address;
+    disasm_info.print_address_func = print_address;
+    disasm_info.symbol_at_address_func = symbol_at_address;
 
     if (endian != BFD_ENDIAN_UNKNOWN)
       {

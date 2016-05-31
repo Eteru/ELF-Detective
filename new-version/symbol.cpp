@@ -3,6 +3,7 @@
 Symbol::Symbol()
 {
   this->defined = false;
+  this->cleared = false;
 }
 
 bool Symbol::isEmpty() const
@@ -30,6 +31,9 @@ std::string Symbol::dumpData()
   if (!this->defined)
     return "This symbols is unkown at link time. Its value will be solved at runtime.";
 
+  if (!this->cleared)
+    this->removeExtraZeros();
+
   std::string ret;
 
   // Symbol information
@@ -37,7 +41,8 @@ std::string Symbol::dumpData()
   ret += (this->type == SYMBOL_VAR) ? "Variable\n" : "Function\n";
 
   // Defined information
-  ret += "Address at definition is " + this->removeExtraZeros(this->def_value) + " (unbound)\n";
+  ret += "Address at definition is " + this->def_value +
+          (this->def_value.compare("0x") == 0 ? "0 (unbound)\n" : "\n");
 
 
   // Undefined information
@@ -50,25 +55,27 @@ std::string Symbol::dumpData()
     }
 
   // Executable file information
-  ret += "Address in executable file is " + this->removeExtraZeros(this->exe_value) + "\n";
+  ret += "Address in executable file is " + this->exe_value + "\n";
   ret +="Section: " + this->section_name
-      + " (address: " + this->removeExtraZeros(this->section_value) + ")\n";
-  ret += "Symbol Offset: " + this->removeExtraZeros(this->offset) + "\n";
+      + " (address: " + this->section_value + ")\n";
+  ret += "Symbol Offset: " + this->offset + "\n";
 
   return ret;
 }
 
-std::string Symbol::removeExtraZeros(std::string addr)
+void Symbol::removeExtraZeros()
 {
-  std::string aux = addr.substr(0, 8);
+  this->cleared = true;
 
-  if (addr.length() > 8 && aux.compare("00000000") == 0)
-    {
-      aux = addr;
-      aux.replace(0, 8, "0x");
+  this->def_value.erase(0, this->def_value.find_first_not_of('0'));
+  this->def_value = "0x" + this->def_value;
 
-      return aux;
-    }
+  this->exe_value.erase(0, this->exe_value.find_first_not_of('0'));
+  this->exe_value = "0x" + this->exe_value;
 
-  return addr;
+  this->section_value.erase(0, this->section_value.find_first_not_of('0'));
+  this->section_value = "0x" + this->section_value;
+
+  this->offset.erase(0, this->offset.find_first_not_of('0'));
+  this->offset = "0x" + this->offset;
 }

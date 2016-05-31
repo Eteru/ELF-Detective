@@ -1,6 +1,8 @@
 #include "codeline.h"
 
 #include <regex>
+#include <sstream>
+#include <cstring>
 
 CodeLine::CodeLine() : line(""), address(""), hexValue(""), symbol("")
 {}
@@ -21,7 +23,6 @@ void CodeLine::setLine(std::string line)
   }
 
   this->line = line;
-
 }
 
 void CodeLine::setAddress(std::string addr)
@@ -34,9 +35,11 @@ void CodeLine::setHexValue(std::string hexval)
   this->hexValue = hexval;
 }
 
-void CodeLine::setSymbol(std::string sym)
+void CodeLine::setSymbol(std::string sym, std::string addr)
 {
   this->symbol = sym;
+  addr.erase(0, addr.find_first_not_of('0'));
+  this->symbolAddress = "0x" + addr;
 }
 
 
@@ -60,10 +63,38 @@ std::string CodeLine::getSymbol() const
   return this->symbol;
 }
 
+void CodeLine::additionalInformation(std::string addr)
+{
+  char str[256];
+  char *token;
+  std::string tok;
+  std::string referredAddr;
+  std::size_t pos;
+
+  this->line.copy(str, this->line.length(), 0);
+  token = strtok((char*)str, " ,");
+  while (token != NULL)
+    {
+      tok = token;
+      pos = tok.find("(%rip)");
+      if (pos != std::string::npos)
+        {
+          referredAddr = tok.substr(0, pos);
+          break;
+        }
+
+      token = strtok(NULL, " ,");
+    }
+
+  this->moreInfo = "%rip points to the next instruction =" + addr + "\n";
+  this->moreInfo += "Symbol address is found by: " + addr + " + " + referredAddr + "\n";
+}
+
 std::string CodeLine::dumpData() const
 {
   if (this->symbol.compare("") == 0)
     return "";
 
-  return "This line refferences symbol: " + this->symbol;
+  return "This line references symbol: <" + this->symbol + ">(" + this->symbolAddress + ")\n" +
+      (this->moreInfo == "" ? "" : this->moreInfo);
 }

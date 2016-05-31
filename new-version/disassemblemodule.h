@@ -20,7 +20,7 @@
 
 /* Extra info to pass to the section disassembler and address printing
    function.  */
-struct objdump_disasm_info
+struct disasm_info
 {
   bfd *              abfd;
   asection *         sec;
@@ -36,12 +36,12 @@ namespace Disassembly
   void print_to_string(std::string);
   int ATTRIBUTE_PRINTF_2 disassemble_print (SFILE *, const char *, ...);
 
-  int objdump_symbol_at_address(bfd_vma, struct disassemble_info *);
-  void objdump_print_addr_with_sym(bfd *, asection *, asymbol *, bfd_vma, struct disassemble_info *);
+  int symbol_at_address(bfd_vma, struct disassemble_info *);
+  void print_addr_with_sym(bfd *, asection *, asymbol *, bfd_vma, struct disassemble_info *);
   asymbol *find_symbol_for_address(bfd_vma, struct disassemble_info *, long *);
-  void objdump_print_value(bfd_vma, struct disassemble_info *);
-  void objdump_print_addr(bfd_vma, struct disassemble_info *);
-  void objdump_print_address(bfd_vma, struct disassemble_info *);
+  void print_value(bfd_vma, struct disassemble_info *);
+  void print_addr(bfd_vma, struct disassemble_info *);
+  void print_address(bfd_vma, struct disassemble_info *);
 
   long remove_useless_symbols (asymbol **, long);
   int compare_relocs(const void *, const void *);

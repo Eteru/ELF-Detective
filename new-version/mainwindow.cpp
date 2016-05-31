@@ -39,10 +39,9 @@ MainWindow::MainWindow(QWidget *parent) :
   ui->objTabs->removeTab(0);
   ui->objTabs->removeTab(0);
 
-  ui->exeFunctionsTree->header()->close();
+  ui->exeFunctionsTree->header()->hide();
+  ui->exeFunctionsTree->headerItem()->setText(0, "Offset");
 
-  /*QShortcut *shortcut = new QShortcut(QKeySequence("Ctrl+E"), ui->addExe);
-  QObject::connect(shortcut, SIGNAL(activated()), ui->addExe, SLOT(on_addExe_clicked()));*/
   new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_E), this, SLOT(on_addExe_clicked()));
   new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_O), this, SLOT(on_addObj_clicked()));
   new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_R), this, SLOT(on_runProj_clicked()));
@@ -56,6 +55,9 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_addObj_clicked()
 {
+  if (!ui->addObj->isEnabled())
+    return;
+
   QString filename = QFileDialog::getOpenFileName(this, tr("Add object file"), "/home");
   QStringList tokens = filename.split("/");
 
@@ -75,6 +77,9 @@ void MainWindow::on_addObj_clicked()
 
 void MainWindow::on_addExe_clicked()
 {
+  if (!ui->addExe->isEnabled())
+    return;
+
   QString filename = QFileDialog::getOpenFileName(this, tr("Add executable file"), "/home");
 
   if (filename == "")
@@ -89,6 +94,9 @@ void MainWindow::on_addExe_clicked()
 
 void MainWindow::on_runProj_clicked()
 {
+  if (!ui->runProj->isEnabled())
+    return;
+
   int errCount = 0, errCode;
   QString errors;
 
@@ -180,6 +188,8 @@ void MainWindow::on_clearProj_clicked()
   ui->addExe->setDisabled(false);
   ui->addObj->setDisabled(false);
   ui->runProj->setDisabled(false);
+
+  ui->exeFunctionsTree->header()->hide();
 }
 
 void MainWindow::on_objTabs_tabCloseRequested(int index)
@@ -196,8 +206,12 @@ void MainWindow::initFunctionTree(ELFFile *E, QTreeWidget *parent) const
 {
   parent->setColumnCount(3);
   parent->setColumnWidth(0, 150);
+  parent->headerItem()->setText(1, "Instruction");
 
   parent->setColumnHidden(2, true);
+  parent->headerItem()->setText(2, "Opcode");
+
+  parent->header()->show();
 
   for (Function *f : E->getFunctions())
     {
