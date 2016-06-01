@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
 
   int x = mainScreenSize.width() *0.7;
   int y = mainScreenSize.height()*0.7;
-  w.setFixedSize(x,y);
+  w.setMinimumSize(x,y);
 
   w.show();
 
