@@ -60,6 +60,9 @@ void AddressBinding::findBindings()
                       entry.def_value = buf;
 
                       entry.defined_section = (*current)->section->name;
+                      dec_value = bfd_asymbol_base(*current);
+                      bfd_sprintf_vma(cur_bfd, buf, dec_value);
+                      entry.def_section_value = buf;
 
                       symbolTable[name] = entry;
                     }

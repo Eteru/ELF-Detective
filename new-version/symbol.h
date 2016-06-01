@@ -23,7 +23,8 @@ public:
   bool isVariable() const;
   bool isFunction() const;
 
-  std::string dumpData();
+  std::string dumpExeData();
+  std::string dumpObjData();
 
   std::string name;
 
@@ -34,13 +35,13 @@ public:
   std::string defined_in;
   std::string exe_name;
 
-  //std::string undef_value;
   std::string def_value;
   std::string exe_value;
 
   std::string defined_section;
   std::string section_name;
   std::string section_value;
+  std::string def_section_value;
   std::string offset;
 
   bfd_vma sz;

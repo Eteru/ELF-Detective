@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
+#include <QTableWidget>
 #include <vector>
 #include <addressbinding.h>
 
@@ -40,6 +41,8 @@ private:
   void showSymbols() const;
   void initFunctionTree(ELFFile *E, QTreeWidget *parent) const;
   void addCodeLines(Function *f, QTreeWidgetItem *parent) const;
+  void addRows(std::string info1, std::string info2);
+  void removeTableRows();
   QString errorMessage(int errCode, ELFFile *E) const;
 
   Ui::MainWindow *ui;

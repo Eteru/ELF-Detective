@@ -124,13 +124,17 @@ namespace Disassembly
           {
             value += "-0x";
             bfd_sprintf_vma(aux->abfd, buf, bfd_asymbol_value(sym) - vma);
-            value += buf;
+            std::string format = buf;
+            format.erase(0, format.find_first_not_of('0'));
+            value += format;
           }
         else if (vma > bfd_asymbol_value(sym))
           {
             value += "+0x";
             bfd_sprintf_vma(aux->abfd, buf, vma - bfd_asymbol_value(sym));
-            value += buf;
+            std::string format = buf;
+            format.erase(0, format.find_first_not_of('0'));
+            value += format;
           }
 
         crtLine->setSymbol(value, symAddr);

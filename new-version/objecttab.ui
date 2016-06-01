@@ -64,13 +64,30 @@ QListView::item:selected:!active {
        <item>
         <widget class="QTreeWidget" name="objFunctionsTree">
          <property name="styleSheet">
-          <string notr="true">QTreeView::item:selected,
+          <string notr="true">QTreeView::branch:selected {
+  background: #add8e6;
+}
+
+QTreeView::branch:selected:active {
+  background: #add8e6;
+}
+
+QTreeView::branch:selected:!active {
+  background: #add8e6;
+}
+
+QTreeView::branch:has-children {
+	image: url(icons/icon-arrow-right.ico);
+}
+
+QTreeView::branch:has-children:!closed {
+	image: url(icons/icon-arrow-down.ico);
+}
+
+QTreeView::item:selected,
 QTreeView::item:selected:!active {
     background: #add8e6;
 	color: #000;
-}
-QTreeView::branch:selected {
-	background-color: #add8e6;
 }</string>
          </property>
          <column>

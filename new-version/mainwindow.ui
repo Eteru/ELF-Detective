@@ -186,10 +186,22 @@ QTreeView::branch:selected:!active {
   background: #99ff99;
 }
 
+QTreeView::branch:has-children {
+	image: url(icons/icon-arrow-right.ico);
+}
+
+QTreeView::branch:has-children:!closed {
+	image: url(icons/icon-arrow-down.ico);
+}
+
 QTreeView::item:selected,
 QTreeView::item:selected:!active {
     background: #99ff99;
 	color: #000;
+}
+
+QTreeWidgetItem {
+	padding: 0;
 }</string>
               </property>
               <column>
@@ -225,7 +237,14 @@ QTreeView::item:selected:!active {
     <item>
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <item alignment="Qt::AlignBottom">
-       <widget class="QTextBrowser" name="infoOutput"/>
+       <widget class="QTableWidget" name="infoOutputTable">
+        <property name="styleSheet">
+         <string notr="true">QTableView {
+	font-size: 14px;
+	color: #000;
+}</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </item>

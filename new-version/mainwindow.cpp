@@ -5,6 +5,7 @@
 #include <QShortcut>
 #include <iostream>
 #include <vector>
+#include <sstream>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -19,9 +20,13 @@ MainWindow::MainWindow(QWidget *parent) :
 
   bfd_init();
 
+  // pages
   ui->exeToolBox->setItemText(0, "Data");
   ui->exeToolBox->setItemText(1, "Functions");
 
+  ui->exeFunctionPage->activateWindow();
+
+  // button icons
   ui->addExe->setIcon(QIcon("icons/icon-add-exe.ico"));
   ui->addObj->setIcon(QIcon("icons/icon-add-obj.ico"));
   ui->runProj->setIcon(QIcon("icons/icon-run.ico"));
@@ -32,16 +37,31 @@ MainWindow::MainWindow(QWidget *parent) :
   ui->runProj->setIconSize(QSize(25, 25));
   ui->clearProj->setIconSize(QSize(25, 25));
 
-  ui->exeFunctionPage->activateWindow();
-
+  // tabs
   ui->objTabs->setTabsClosable(true);
-
   ui->objTabs->removeTab(0);
   ui->objTabs->removeTab(0);
 
+  // tree
   ui->exeFunctionsTree->header()->hide();
   ui->exeFunctionsTree->headerItem()->setText(0, "Offset");
 
+  // output table
+  ui->infoOutputTable->setColumnCount(2);
+
+  ui->infoOutputTable->setShowGrid(false);
+  ui->infoOutputTable->verticalHeader()->setVisible(false);
+  ui->infoOutputTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+  ui->infoOutputTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+  ui->infoOutputTable->setSelectionMode(QAbstractItemView::SingleSelection);
+
+  ui->infoOutputTable->setHorizontalHeaderLabels(QStringList()<<"Executable"<<"Object");
+  ui->infoOutputTable->horizontalHeader()->setDefaultAlignment(Qt::AlignLeft);
+  ui->infoOutputTable->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
+  ui->infoOutputTable->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
+  ui->infoOutputTable->horizontalHeader()->setSectionsClickable(false);
+
+  // shortcuts
   new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_E), this, SLOT(on_addExe_clicked()));
   new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_O), this, SLOT(on_addObj_clicked()));
   new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_R), this, SLOT(on_runProj_clicked()));
@@ -183,7 +203,7 @@ void MainWindow::on_clearProj_clicked()
 
   ui->exeDataList->clear();
   ui->exeFunctionsTree->clear();
-  ui->infoOutput->clear();
+  this->removeTableRows();
 
   ui->addExe->setDisabled(false);
   ui->addObj->setDisabled(false);
@@ -232,6 +252,7 @@ void MainWindow::addCodeLines(Function *f, QTreeWidgetItem *parent) const
   for (CodeLine *c : f->getCodeLines())
     {
       QTreeWidgetItem *itm = new QTreeWidgetItem(parent);
+
       itm->setText(0, QString::fromStdString(c->getAddress()));
       itm->setText(1, QString::fromStdString(c->getLine()));
       itm->setText(2, QString::fromStdString(c->getHexValue()));
@@ -278,6 +299,35 @@ void MainWindow::showSymbols() const
             tui->addSymbol(S);
         }
     }
+}
+
+// adds a line of text to each column
+void MainWindow::addRows(std::string info1, std::string info2)
+{
+  std::stringstream ss(info1);
+  std::stringstream ss2(info2);
+  std::string line;
+  std::string line2;
+
+  while (std::getline(ss, line, '\n'))
+    {
+      ui->infoOutputTable->insertRow(ui->infoOutputTable->rowCount());
+      ui->infoOutputTable->setItem(ui->infoOutputTable->rowCount() - 1,
+                                   0, new QTableWidgetItem(QString::fromStdString(line)));
+
+      // object file should always have the same number of rows or less
+      std::getline(ss2, line2, '\n');
+
+      ui->infoOutputTable->setItem(ui->infoOutputTable->rowCount() - 1,
+                                   1, new QTableWidgetItem(QString::fromStdString(line2)));
+    }
+}
+
+// clear table content
+void MainWindow::removeTableRows()
+{
+  while (ui->infoOutputTable->rowCount() > 0)
+    ui->infoOutputTable->removeRow(0);
 }
 
 QString MainWindow::errorMessage(int errCode, ELFFile *E) const
@@ -328,8 +378,8 @@ void MainWindow::on_exeDataList_clicked(const QModelIndex &index)
         }
     }
 
-  ui->infoOutput->clear();
-  ui->infoOutput->append(QString::fromStdString(sym.dumpData()));
+  this->removeTableRows();
+  this->addRows(sym.dumpExeData(), sym.dumpObjData());
 }
 
 void MainWindow::on_exeFunctionsTree_itemClicked(QTreeWidgetItem *item, int column)
@@ -354,24 +404,29 @@ void MainWindow::on_exeFunctionsTree_itemClicked(QTreeWidgetItem *item, int colu
               if (parent == nullptr)
                 {
                   ot->selectFunction(symbolName);
-                  ui->infoOutput->clear();
-                  ui->infoOutput->append(QString::fromStdString(sym.dumpData()));
+                  this->removeTableRows();
+                  this->addRows(sym.dumpExeData(), sym.dumpObjData());
                 }
               else
                 {
                   int itemAt = ui->exeFunctionsTree->currentIndex().row();
-                  std::vector<Function *> funcs = this->exefile->getFunctions();
-                  auto it = find_if(funcs.begin(), funcs.end(),
+                  std::vector<Function *> exeFuncs = this->exefile->getFunctions();
+                  auto exeIt = find_if(exeFuncs.begin(), exeFuncs.end(),
                                     [&sym](Function *F) {return F->getName().compare(sym.name) == 0;});
 
-                  ui->infoOutput->clear();
+                  std::vector<Function *> objFuncs = this->objfiles[i]->getFunctions();
+                  auto objIt = find_if(objFuncs.begin(), objFuncs.end(),
+                                    [&sym](Function *F) {return F->getName().compare(sym.name) == 0;});
 
-                  if (it != funcs.end())
+                  this->removeTableRows();
+
+                  if (exeIt != exeFuncs.end())
                     {
-                      std::vector<CodeLine *> c = (*it)->getCodeLines();
+                      std::vector<CodeLine *> c1 = (*exeIt)->getCodeLines();
+                      std::vector<CodeLine *> c2 = (*objIt)->getCodeLines();
                       ot->selectFunctionLine(symbolName, itemAt);
 
-                      ui->infoOutput->append(QString::fromStdString(c[itemAt]->dumpData()));
+                      this->addRows(c1[itemAt]->dumpData(), c2[itemAt]->dumpData());
                     }
                 }
 
