@@ -914,8 +914,11 @@ namespace Disassembly
     // Use libopcodes to locate a suitable disassembler.
     aux.disassemble_fn = disassembler(abfd);
     if (!aux.disassemble_fn)
-      std::cerr << "can't disassemble for architecture "
-                << bfd_printable_arch_mach(bfd_get_arch(abfd), 0) << std::endl;
+      {
+        std::cerr << "can't disassemble for architecture "
+                  << bfd_printable_arch_mach(bfd_get_arch(abfd), 0) << std::endl;
+        return;
+      }
 
     disasm_info.flavour = bfd_get_flavour(abfd);
     disasm_info.arch = bfd_get_arch(abfd);

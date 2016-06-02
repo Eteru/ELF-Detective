@@ -31,11 +31,11 @@ private slots:
 
   void on_objTabs_tabCloseRequested(int index);
 
-  void on_exeDataList_clicked(const QModelIndex &index);
-
-  void on_exeFunctionsTree_itemClicked(QTreeWidgetItem *item, int column);
-
   void on_checkHex_clicked(bool checked);
+
+  void on_exeFunctionsTree_itemSelectionChanged();
+
+  void on_exeDataList_itemSelectionChanged();
 
 private:
   void showSymbols() const;

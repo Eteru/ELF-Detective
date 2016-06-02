@@ -3,6 +3,7 @@
 #include <QPushButton>
 #include <QIcon>
 #include <QShortcut>
+#include <QSettings>
 #include <iostream>
 #include <vector>
 #include <sstream>
@@ -78,21 +79,32 @@ void MainWindow::on_addObj_clicked()
   if (!ui->addObj->isEnabled())
     return;
 
-  QString filename = QFileDialog::getOpenFileName(this, tr("Add object file"), "/home");
-  QStringList tokens = filename.split("/");
+  const QString DEFAULT_DIR_KEY("/home");
+  QSettings MySettings;
+  QStringList filenames = QFileDialog::getOpenFileNames(this, tr("Add object files"),
+                                                        MySettings.value(DEFAULT_DIR_KEY).toString());
 
-  if (filename == "")
-    return;
+  for (QString filename : filenames)
+    {
+      if (filename == "")
+        return;
 
-  ELFFile *obj = new ELFFile(filename.toStdString());
-  this->objfiles.push_back(obj);
+      QStringList tokens = filename.split("/");
 
-  filename = tokens.value(tokens.length() - 1);
+      QDir CurrentDir;
+      MySettings.setValue(DEFAULT_DIR_KEY, CurrentDir.absoluteFilePath(filename));
 
-  QWidget *view = new objecttab();
-  obj->setView(view);
+      ELFFile *obj = new ELFFile(filename.toStdString());
+      this->objfiles.push_back(obj);
 
-  ui->objTabs->insertTab(ui->objTabs->count(), view, QIcon(QString("")), filename);
+      filename = tokens.value(tokens.length() - 1);
+
+      QWidget *view = new objecttab();
+      obj->setView(view);
+
+      ui->objTabs->insertTab(ui->objTabs->count(), view, QIcon(QString("")), filename);
+    }
+
 }
 
 void MainWindow::on_addExe_clicked()
@@ -100,10 +112,16 @@ void MainWindow::on_addExe_clicked()
   if (!ui->addExe->isEnabled())
     return;
 
-  QString filename = QFileDialog::getOpenFileName(this, tr("Add executable file"), "/home");
+  const QString DEFAULT_DIR_KEY("/home");
+  QSettings MySettings;
+  QString filename = QFileDialog::getOpenFileName(this, tr("Add executable file"),
+                                                  MySettings.value(DEFAULT_DIR_KEY).toString());
 
   if (filename == "")
     return;
+
+  QDir CurrentDir;
+  MySettings.setValue(DEFAULT_DIR_KEY, CurrentDir.absoluteFilePath(filename));
 
   this->exefile = new ELFFile(filename.toStdString());
 
@@ -359,33 +377,20 @@ QString MainWindow::errorMessage(int errCode, ELFFile *E) const
   return msg;
 }
 
-void MainWindow::on_exeDataList_clicked(const QModelIndex &index)
+void MainWindow::on_checkHex_clicked(bool checked)
 {
+  ui->exeFunctionsTree->setColumnHidden(1, checked);
+  ui->exeFunctionsTree->setColumnHidden(2, !checked);
 
-  QString symbolName = ui->exeDataList->item(index.row())->text();
-  Symbol sym = AB->getSymbol(symbolName.toStdString());
-
-  std::string filename = sym.defined_in;
-
-  for (unsigned int i = 0; i < this->objfiles.size(); ++i)
-    {
-      if (this->objfiles[i]->getName().compare(filename) == 0)
-        {
-          objecttab *ot = (objecttab *)this->objfiles[i]->getView();
-          ui->objTabs->setCurrentIndex(i);
-          ot->selectSymbol(symbolName);
-          break;
-        }
-    }
-
-  this->removeTableRows();
-  this->addRows(sym.dumpExeData(), sym.dumpObjData());
+  for (ELFFile *E : this->objfiles)
+    ((objecttab *)E->getView())->toggleHex(checked);
 }
 
-void MainWindow::on_exeFunctionsTree_itemClicked(QTreeWidgetItem *item, int column)
-{
-  (void)column;
 
+void MainWindow::on_exeFunctionsTree_itemSelectionChanged()
+{
+  QModelIndex idx = ui->exeFunctionsTree->selectionModel()->selectedIndexes()[0];
+  QTreeWidgetItem *item = (QTreeWidgetItem *)idx.internalPointer();
   QTreeWidgetItem *parent = item->parent();
   QString symbolName = (parent == nullptr) ? item->text(0) : parent->text(0);
   Symbol sym = AB->getSymbol(symbolName.toStdString());
@@ -412,11 +417,11 @@ void MainWindow::on_exeFunctionsTree_itemClicked(QTreeWidgetItem *item, int colu
                   int itemAt = ui->exeFunctionsTree->currentIndex().row();
                   std::vector<Function *> exeFuncs = this->exefile->getFunctions();
                   auto exeIt = find_if(exeFuncs.begin(), exeFuncs.end(),
-                                    [&sym](Function *F) {return F->getName().compare(sym.name) == 0;});
+                                       [&sym](Function *F) {return F->getName().compare(sym.name) == 0;});
 
                   std::vector<Function *> objFuncs = this->objfiles[i]->getFunctions();
                   auto objIt = find_if(objFuncs.begin(), objFuncs.end(),
-                                    [&sym](Function *F) {return F->getName().compare(sym.name) == 0;});
+                                       [&sym](Function *F) {return F->getName().compare(sym.name) == 0;});
 
                   this->removeTableRows();
 
@@ -436,11 +441,25 @@ void MainWindow::on_exeFunctionsTree_itemClicked(QTreeWidgetItem *item, int colu
     }
 }
 
-void MainWindow::on_checkHex_clicked(bool checked)
+void MainWindow::on_exeDataList_itemSelectionChanged()
 {
-  ui->exeFunctionsTree->setColumnHidden(1, checked);
-  ui->exeFunctionsTree->setColumnHidden(2, !checked);
+  QModelIndex index = ui->exeDataList->selectionModel()->selectedIndexes()[0];
+  QString symbolName = ui->exeDataList->item(index.row())->text();
+  Symbol sym = AB->getSymbol(symbolName.toStdString());
 
-  for (ELFFile *E : this->objfiles)
-    ((objecttab *)E->getView())->toggleHex(checked);
+  std::string filename = sym.defined_in;
+
+  for (unsigned int i = 0; i < this->objfiles.size(); ++i)
+    {
+      if (this->objfiles[i]->getName().compare(filename) == 0)
+        {
+          objecttab *ot = (objecttab *)this->objfiles[i]->getView();
+          ui->objTabs->setCurrentIndex(i);
+          ot->selectSymbol(symbolName);
+          break;
+        }
+    }
+
+  this->removeTableRows();
+  this->addRows(sym.dumpExeData(), sym.dumpObjData());
 }

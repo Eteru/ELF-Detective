@@ -12,6 +12,9 @@ int main(int argc, char *argv[])
 
   int x = mainScreenSize.width() *0.7;
   int y = mainScreenSize.height()*0.7;
+
+  a.setApplicationName("ELF Detective");
+
   w.setMinimumSize(x,y);
 
   w.show();
