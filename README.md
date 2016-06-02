@@ -7,14 +7,14 @@
 
 2. Install qt.
     * check https://wiki.qt.io/Install_Qt_5_on_Ubuntu for more details on this.
-    * note that this application uses Qt 5.5 and the 5.5 directory is looked for in the Makefile
 
 3. Download and unzip the contents and go to new-version directory.
     * https://github.com/Eteru/ELF-Detective/archive/master.zip
 
 4. Set up path to Qt directory.
-    * PATH_TO_QT=/path/to/qt/ && export PATH_TO_QT
-    * note that inside the qt folder should be the 5.5 version
+    * PATH_TO_QT=/path/to/qt/version/ && export PATH_TO_QT
+    * example: PATH_TO_QT=/home/eteru/Qt/5.5/
+    * note that inside the qt folder should be the 5.5 version (or higher)
 
 5. make
 
