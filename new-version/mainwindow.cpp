@@ -219,6 +219,8 @@ void MainWindow::on_clearProj_clicked()
       ui->objTabs->removeTab(0);
     }
 
+  ui->exeDataList->reset();
+  ui->exeFunctionsTree->reset();
   ui->exeDataList->clear();
   ui->exeFunctionsTree->clear();
   this->removeTableRows();
