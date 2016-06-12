@@ -13,8 +13,8 @@
 
 4. Set up path to Qt directory.
     * PATH_TO_QT=/path/to/qt/version/ && export PATH_TO_QT
-    * example: PATH_TO_QT=/home/eteru/Qt/5.5/
-    * note that inside the qt folder should be the 5.5 version (or higher)
+    * example: PATH_TO_QT=/home/eteru/Qt/5.6/
+    * note that inside the qt folder should be the 5.6 version (or higher)
 
 5. make
 
