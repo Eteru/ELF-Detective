@@ -414,7 +414,7 @@ void MainWindow::on_exeFunctionsTree_itemSelectionChanged()
                 }
               else
                 {
-                  int itemAt = ui->exeFunctionsTree->currentIndex().row();
+                  unsigned int itemAt = ui->exeFunctionsTree->currentIndex().row();
                   std::vector<Function *> exeFuncs = this->exefile->getFunctions();
                   auto exeIt = find_if(exeFuncs.begin(), exeFuncs.end(),
                                        [&sym](Function *F) {return F->getName().compare(sym.name) == 0;});
@@ -429,9 +429,16 @@ void MainWindow::on_exeFunctionsTree_itemSelectionChanged()
                     {
                       std::vector<CodeLine *> c1 = (*exeIt)->getCodeLines();
                       std::vector<CodeLine *> c2 = (*objIt)->getCodeLines();
-                      ot->selectFunctionLine(symbolName, itemAt);
 
-                      this->addRows(c1[itemAt]->dumpData(), c2[itemAt]->dumpData());
+                      if (itemAt >= c2.size())
+                        {
+                          this->addRows(c1[itemAt]->dumpData(), "");
+                        }
+                      else {
+                          ot->selectFunctionLine(symbolName, itemAt);
+                          this->addRows(c1[itemAt]->dumpData(), c2[itemAt]->dumpData());
+                        }
+
                     }
                 }
 
