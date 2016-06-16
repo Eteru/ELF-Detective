@@ -39,7 +39,6 @@ MainWindow::MainWindow(QWidget *parent) :
   ui->clearProj->setIconSize(QSize(25, 25));
 
   // tabs
-  ui->objTabs->setTabsClosable(true);
   ui->objTabs->removeTab(0);
   ui->objTabs->removeTab(0);
 
